@@ -19,14 +19,12 @@ void setup()
 }
 
 void loop() {
-  irsend.sendNEC(BENQ_POWER, 32);
-	// delay(1000);
-  // irsend.sendNEC(ONKYO_VOLUP, 32);
-	// delay(1000);
-  // irsend.sendNEC(ONKYO_VOLDN, 32);
-	// delay(1000);
-  // irsend.sendNEC(OKNYO_POWER, 32);
+  irsend.sendNEC(OKNYO_POWER, 32);
+	delay(1000);
+  irsend.sendNEC(ONKYO_VOLUP, 32);
+	delay(1000);
+  irsend.sendNEC(ONKYO_VOLDN, 32);
+	delay(1000);
+  irsend.sendNEC(OKNYO_POWER, 32);
 	delay(2000);
-  irsend.sendNEC(BENQ_POWER, 32);
-  while(true);
 }
