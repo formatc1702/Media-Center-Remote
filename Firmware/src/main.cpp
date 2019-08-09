@@ -1,7 +1,9 @@
 #include <Arduino.h>
 #include <IRremote.h>
+#include <avr/sleep.h>
+#include <avr/power.h>
 
-#define OKNYO_POWER     0x4B20D32C
+#define ONKYO_POWER     0x4B20D32C
 #define ONKYO_VOLUP     0x4BC040BF
 #define ONKYO_VOLDN     0x4BC0C03F
 #define ONKYO_MUTE      0x4BC0A05F
@@ -11,32 +13,55 @@
 #define BENQ_POWER      0xC40BF
 #define BENQ_ECOBLANK   0xC0CF3
 
+#define PIN_STATUS 13
+
 IRsend irsend;
+
+void wakeUp() {
+}
+
+void enterSleep() {
+  // Serial.println("Good night!");
+  digitalWrite(PIN_STATUS, LOW);
+
+  delay(100);
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  sleep_enable();
+  attachInterrupt(0, wakeUp, LOW);
+  sleep_mode();
+  // sleep happens here
+  sleep_disable();
+  detachInterrupt(0);
+  // Serial.println("Good morning!");
+}
 
 void setup()
 {
-
+  // Serial.begin(115200);
+  pinMode(PIN_STATUS, OUTPUT);
+  digitalWrite(PIN_STATUS, LOW);
 }
 
 void loop() {
-  irsend.sendNEC(ONKYO_VOLUP, 32);
-	delay(200);
-  irsend.sendNEC(ONKYO_VOLUP, 32);
-	delay(200);
-  irsend.sendNEC(ONKYO_VOLUP, 32);
-	delay(200);
-  irsend.sendNEC(ONKYO_VOLUP, 32);
-	delay(200);
-  irsend.sendNEC(ONKYO_VOLUP, 32);
-	delay(1000);
-  irsend.sendNEC(ONKYO_VOLDN, 32);
-	delay(200);
-  irsend.sendNEC(ONKYO_VOLDN, 32);
-	delay(200);
-  irsend.sendNEC(ONKYO_VOLDN, 32);
-	delay(200);
-  irsend.sendNEC(ONKYO_VOLDN, 32);
-	delay(200);
-  irsend.sendNEC(ONKYO_VOLDN, 32);
-	delay(1000);
+  enterSleep();
+  digitalWrite(PIN_STATUS, HIGH);
+  irsend.sendNEC(ONKYO_POWER, 32);
+  // irsend.sendNEC(ONKYO_VOLUP, 32);
+	// delay(200);
+  // irsend.sendNEC(ONKYO_VOLUP, 32);
+	// delay(200);
+  // irsend.sendNEC(ONKYO_VOLUP, 32);
+	// delay(200);
+  // irsend.sendNEC(ONKYO_VOLUP, 32);
+	// delay(1000);
+  // irsend.sendNEC(ONKYO_VOLDN, 32);
+	// delay(200);
+  // irsend.sendNEC(ONKYO_VOLDN, 32);
+	// delay(200);
+  // irsend.sendNEC(ONKYO_VOLDN, 32);
+	// delay(200);
+  // irsend.sendNEC(ONKYO_VOLDN, 32);
+	// delay(200);
+  // irsend.sendNEC(ONKYO_VOLDN, 32);
+	// delay(1000);
 }
