@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <IRremote.h>
-#include <avr/sleep.h>
-#include <avr/power.h>
+#include "LowPower.h"
 
 #define ONKYO_POWER     0x4B20D32C
 #define ONKYO_VOLUP     0x4BC040BF
@@ -20,73 +19,61 @@
 #define PIN_BTN_PWR1      7
 #define PIN_BTN_PWR2      8
 
+/*
+fuse settings:
+avrdude -c arduino -p m328p -P /dev/tty.SLAB_USBtoUART -b 19200 -U lfuse:w:0xc2:m -U hfuse:w:0xda:m -U efuse:w:0xfe:m
+
+bootloader (Arduino Pro Mini 8MHz):
+avrdude -c arduino -p m328p -P /dev/tty.SLAB_USBtoUART -b 19200 -U flash:w:/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/bootloaders/atmega/ATmegaBOOT_168_atmega328_pro_8MHz.hex -v
+*/
+
 IRsend irsend;
 
-void wakeUp() {
-}
-
-void enterSleep() {
-  // Serial.println("Good night!");
-  digitalWrite(PIN_STATUS, LOW);
-
-  delay(100);
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-  sleep_enable();
-  attachInterrupt(0, wakeUp, LOW);
-  sleep_mode();
-  // sleep happens here
-  sleep_disable();
-  detachInterrupt(0);
-  // Serial.println("Good morning!");
-}
+void wakeUp() {}
 
 void setup()
 {
-  Serial.begin(115200);
-  pinMode(PIN_STATUS, OUTPUT);
+  for (size_t i = 0; i < 20; i++) {
+    pinMode(i, INPUT); // set all pins to high-Z
+  }
+  pinMode(PIN_INTERRUPT, INPUT_PULLUP);
   pinMode(PIN_BTN_VOLUP, INPUT_PULLUP);
   pinMode(PIN_BTN_VOLDN, INPUT_PULLUP);
   pinMode(PIN_BTN_PWR1, INPUT_PULLUP);
   pinMode(PIN_BTN_PWR2, INPUT_PULLUP);
+  pinMode(PIN_STATUS, OUTPUT);
   digitalWrite(PIN_STATUS, LOW);
+
+  digitalWrite(PIN_STATUS, HIGH); delay(50);
+  digitalWrite(PIN_STATUS, LOW);  delay(100);
+  digitalWrite(PIN_STATUS, HIGH); delay(50);
+  digitalWrite(PIN_STATUS, LOW);  delay(100);
 }
 
 void loop() {
-  enterSleep();
+
+  // sleep
+  delay(50);
+  attachInterrupt(0, wakeUp, LOW);
+  LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
+  detachInterrupt(0);
+
+  // send remote code
   digitalWrite(PIN_STATUS, HIGH);
+  delay(50);
   if        (digitalRead(PIN_BTN_VOLDN) == LOW) {
     Serial.println("Vol down");
     irsend.sendNEC(ONKYO_VOLDN, 32);
   } else if (digitalRead(PIN_BTN_VOLUP) == LOW) {
     Serial.println("Vol up");
     irsend.sendNEC(ONKYO_VOLUP, 32);
-  } else if (digitalRead(PIN_BTN_PWR1) == LOW) {
+  } else if (digitalRead(PIN_BTN_PWR1)  == LOW) {
     Serial.println("Onkyo on/off");
     irsend.sendNEC(ONKYO_POWER, 32);
-  } else if (digitalRead(PIN_BTN_PWR2) == LOW) {
+  } else if (digitalRead(PIN_BTN_PWR2)  == LOW) {
     Serial.println("BenQ on/off");
     irsend.sendNEC(BENQ_POWER, 32);
   }
-  delay(100);
+  delay(50);
   digitalWrite(PIN_STATUS, LOW);
-  // digitalWrite(PIN_STATUS, HIGH);
-  // irsend.sendNEC(ONKYO_POWER, 32);
-  // irsend.sendNEC(ONKYO_VOLUP, 32);
-	// delay(200);
-  // irsend.sendNEC(ONKYO_VOLUP, 32);
-	// delay(200);
-  // irsend.sendNEC(ONKYO_VOLUP, 32);
-	// delay(200);
-  // irsend.sendNEC(ONKYO_VOLUP, 32);
-	// delay(1000);
-  // irsend.sendNEC(ONKYO_VOLDN, 32);
-	// delay(200);
-  // irsend.sendNEC(ONKYO_VOLDN, 32);
-	// delay(200);
-  // irsend.sendNEC(ONKYO_VOLDN, 32);
-	// delay(200);
-  // irsend.sendNEC(ONKYO_VOLDN, 32);
-	// delay(200);
-  // irsend.sendNEC(ONKYO_VOLDN, 32);
-	// delay(1000);
 }
