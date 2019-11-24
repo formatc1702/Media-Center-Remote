@@ -12,12 +12,12 @@
 #define BENQ_POWER      0xC40BF
 #define BENQ_ECOBLANK   0xC0CF3
 
-#define PIN_STATUS   13
+#define PIN_STATUS   10
 #define PIN_INTERRUPT 2 // used by attachInterrupt(0,...)
-#define PIN_BTN_VOLDN     5
-#define PIN_BTN_VOLUP     6
-#define PIN_BTN_PWR1      7
-#define PIN_BTN_PWR2      8
+#define PIN_BTN_VOLDN     8
+#define PIN_BTN_VOLUP     7
+#define PIN_BTN_PWR1      6
+#define PIN_BTN_PWR2      5
 
 /*
 fuse settings:
