@@ -16,6 +16,7 @@
 #define PIN_INTERRUPT 2 // used by attachInterrupt(0,...)
 #define PIN_BTN_VOLDN     8
 #define PIN_BTN_VOLUP     7
+#define PIN_BTN_SRC      14
 #define PIN_BTN_PWR1      6
 #define PIN_BTN_PWR2      5
 
@@ -41,6 +42,7 @@ void setup()
   pinMode(PIN_BTN_VOLDN, INPUT_PULLUP);
   pinMode(PIN_BTN_PWR1, INPUT_PULLUP);
   pinMode(PIN_BTN_PWR2, INPUT_PULLUP);
+  pinMode(PIN_BTN_SRC, INPUT_PULLUP);
   pinMode(PIN_STATUS, OUTPUT);
   digitalWrite(PIN_STATUS, LOW);
 
@@ -67,6 +69,9 @@ void loop() {
   } else if (digitalRead(PIN_BTN_VOLUP) == LOW) {
     Serial.println("Vol up");
     irsend.sendNEC(ONKYO_VOLUP, 32);
+  } else if (digitalRead(PIN_BTN_SRC)  == LOW) {
+    Serial.println("Onkyo next source");
+    irsend.sendNEC(ONKYO_INPUTNEXT, 32);
   } else if (digitalRead(PIN_BTN_PWR1)  == LOW) {
     Serial.println("Onkyo on/off");
     irsend.sendNEC(ONKYO_POWER, 32);
